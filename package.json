@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "latest",
+    "csv-parse": "^6.0.7",
     "cypress": "latest",
     "date-fns": "^4.1.0",
     "dotenv": "latest",
@@ -36,7 +37,7 @@
     "mongodb": "^7.0.0",
     "mongoose": "latest",
     "multer": "latest",
-    "next": "16.0.5",
+    "next": "^16.0.8",
     "node-notifier": "latest",
     "path": "0.12.7",
     "puppeteer": "latest",
@@ -53,7 +54,6 @@
     "terser": "latest",
     "tsx": "latest",
     "tw-animate-css": "latest",
-    "xlsx": "latest",
     "yaml": "latest"
   },
   "devDependencies": {

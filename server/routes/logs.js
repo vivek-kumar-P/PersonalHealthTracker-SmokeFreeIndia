@@ -1,6 +1,6 @@
 import express from "express"
 import multer from "multer"
-import xlsx from "xlsx"
+import { parse as csvParseSync } from "csv-parse/sync"
 import Log from "../models/Log.js"
 import { authenticateToken } from "../middleware/auth.js"
 
@@ -45,13 +45,26 @@ router.post("/upload", authenticateToken, upload.single("file"), async (req, res
     }
 
     // Parse file
-    const workbook = xlsx.read(req.file.buffer, { type: "buffer" })
-    const sheetName = workbook.SheetNames[0]
-    const sheet = workbook.Sheets[sheetName]
-    const data = xlsx.utils.sheet_to_json(sheet)
+    const fileName = req.file.originalname || ""
+    const isCsv = fileName.toLowerCase().endsWith(".csv")
 
-    if (data.length === 0) {
-      return res.status(400).json({ error: "CSV file is empty" })
+    let data = []
+
+    if (isCsv) {
+      // Parse CSV buffer to objects. Expect header row.
+      const text = req.file.buffer.toString("utf8")
+      data = csvParseSync(text, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+      })
+    } else {
+      // For safety we currently only accept CSV uploads. XLSX parsing via sheetjs is vulnerable.
+      return res.status(400).json({ error: "Only CSV uploads are accepted for security reasons. Please save your Excel file as CSV and re-upload." })
+    }
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return res.status(400).json({ error: "CSV file is empty or could not be parsed" })
     }
 
     // Get headers and normalize them
