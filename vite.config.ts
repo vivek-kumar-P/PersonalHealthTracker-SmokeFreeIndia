@@ -23,4 +23,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) return 'vendor-react'
+            if (id.includes('recharts') || id.includes('chart.js') || id.includes('react-chartjs-2')) return 'vendor-charts'
+            if (id.includes('lucide-react') || id.includes('@radix-ui')) return 'vendor-ui'
+            if (id.includes('embla-carousel-react') || id.includes('react-day-picker')) return 'vendor-carousel'
+            return 'vendor'
+          }
+        },
+      },
+    },
+  },
 })

@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5000/api"
 
 // Auth helpers
 export const getToken = () => localStorage.getItem("token")
@@ -14,18 +14,18 @@ export const removeUser = () => localStorage.removeItem("user")
 // API client
 async function apiClient(endpoint: string, options: RequestInit = {}) {
   const token = getToken()
-  const headers: HeadersInit = {
+  const headersObj: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
+    ...(options.headers as Record<string, string> | undefined),
   }
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`
+    headersObj["Authorization"] = `Bearer ${token}`
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
-    headers,
+    headers: headersObj as HeadersInit,
   })
 
   if (!response.ok) {

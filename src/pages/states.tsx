@@ -25,7 +25,7 @@ import {
   Filler,
 } from "chart.js"
 import { Bar, Pie, Doughnut, Line, Radar, PolarArea } from "react-chartjs-2"
-import { Search, TrendingUp, TrendingDown, Users, AlertCircle, Smartphone, Zap } from "lucide-react"
+import { Search, Users, AlertCircle, Smartphone, Zap } from "lucide-react"
 
 ChartJS.register(
   CategoryScale,
