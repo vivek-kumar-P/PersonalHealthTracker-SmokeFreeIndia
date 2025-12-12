@@ -32,6 +32,11 @@ app.use("/auth", authRoutes)
 app.use("/states", statesRoutes)
 app.use("/logs", logsRoutes)
 
+// Alternate /api prefix for clients configured with /api base paths
+app.use("/api/auth", authRoutes)
+app.use("/api/states", statesRoutes)
+app.use("/api/logs", logsRoutes)
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "SmokeFree India API is running" })

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FlippableChart } from "../components/flippable-chart"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -365,9 +366,9 @@ export function DashboardPage() {
           </Card>
         )}
 
-        {/* Stats Cards */}
+        {/* Stats Cards - FIXED: Proper overflow handling */}
         <div className="mb-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-2">
               <CardDescription>Days Smoke-Free</CardDescription>
             </CardHeader>
@@ -377,17 +378,17 @@ export function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-2">
               <CardDescription>Money Saved</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-emerald-600">₹{moneySaved.toLocaleString()}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-emerald-600 break-words">₹{moneySaved.toLocaleString()}</div>
               <p className="mt-1 text-sm text-gray-600">at ₹10/cigarette</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-2">
               <CardDescription>Life Regained</CardDescription>
             </CardHeader>
@@ -397,7 +398,7 @@ export function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader className="pb-2">
               <CardDescription>Total Logs</CardDescription>
             </CardHeader>
@@ -411,26 +412,101 @@ export function DashboardPage() {
         {/* Charts */}
         {userLogs.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
+            {/* Daily Cigarettes Chart - Flippable - FIXED: Proper overflow handling */}
+            <Card className="h-full border-0 shadow-md overflow-hidden flex flex-col">
+              <CardHeader className="flex-shrink-0">
                 <CardTitle>Daily Cigarettes (Last 30 Days)</CardTitle>
                 <CardDescription>Track your daily consumption</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <Line data={dailyData} options={chartOptions} />
+              {/* Chart content wrapper - FIXED: h-96 ensures proper sizing, overflow-hidden prevents breakout */}
+              <CardContent className="flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+                <div className="w-full h-80 sm:h-96">
+                  <FlippableChart
+                    title="Daily Cigarettes (Last 30 Days)"
+                    description="Track your daily consumption over the past month"
+                    insights={[
+                      {
+                        title: "📊 Trend Analysis",
+                        points: [
+                          `Average: ${(userLogs.slice(-30).reduce((sum, log) => sum + log.cigarettes, 0) / Math.max(userLogs.slice(-30).length, 1)).toFixed(1)} cigarettes/day`,
+                          userLogs.slice(-30).every(log => log.cigarettes <= userLogs.slice(-30)[0]?.cigarettes || 0) 
+                            ? "Positive trend: Consistent reduction"
+                            : "Fluctuating consumption - identify trigger patterns",
+                          `Peak consumption: ${Math.max(...userLogs.slice(-30).map(log => log.cigarettes))} cigarettes`,
+                        ],
+                      },
+                      {
+                        title: "💡 Possible Reasons",
+                        points: [
+                          "Stress or anxiety triggers increased consumption",
+                          "Social situations or peer influence",
+                          "Habit-driven smoking (e.g., after meals, morning coffee)",
+                          "Withdrawal symptoms during initial quit attempts",
+                        ],
+                      },
+                      {
+                        title: "🎯 Recommended Actions",
+                        points: [
+                          "Identify patterns: Note time of day and triggers for each cigarette",
+                          "Use NRT (Nicotine Replacement Therapy) patches or gum for cravings",
+                          "Practice stress management: Exercise, meditation, or deep breathing",
+                          "Replace habit: Chew gum, sip water, or walk when urge strikes",
+                          "Celebrate daily wins: Reward smoke-free days",
+                        ],
+                      },
+                    ]}
+                  >
+                    <Line data={dailyData} options={chartOptions} />
+                  </FlippableChart>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
+            {/* Weekly Summary Chart - Flippable - FIXED: Proper overflow handling */}
+            <Card className="h-full border-0 shadow-md overflow-hidden flex flex-col">
+              <CardHeader className="flex-shrink-0">
                 <CardTitle>Weekly Summary</CardTitle>
                 <CardDescription>Cigarettes per week</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <Bar data={weeklyChartData} options={chartOptions} />
+              {/* Chart content wrapper - FIXED: h-96 ensures proper sizing, overflow-hidden prevents breakout */}
+              <CardContent className="flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+                <div className="w-full h-80 sm:h-96">
+                  <FlippableChart
+                    title="Weekly Summary"
+                    description="Total cigarettes consumed per week"
+                    insights={[
+                      {
+                        title: "📈 Progress Assessment",
+                        points: [
+                          `Total cigarettes this month: ${userLogs.slice(-30).reduce((sum, log) => sum + log.cigarettes, 0)}`,
+                          `Weekly average: ${(userLogs.slice(-30).reduce((sum, log) => sum + log.cigarettes, 0) / Math.ceil(Math.max(userLogs.slice(-30).length, 1) / 7)).toFixed(0)}`,
+                          `Most cigarettes in a week: ${Math.max(...Object.values(weeklyData).filter(v => typeof v === 'number') as number[])}`,
+                          `Weeks with improvement: Track your downward trend`,
+                        ],
+                      },
+                      {
+                        title: "💡 Positive Reinforcement",
+                        points: [
+                          "Every reduction counts - celebrate weekly wins",
+                          "Visualize health improvements: Lungs healing, taste improving",
+                          "Financial impact: Each avoided cigarette = ₹10 saved",
+                          "Social benefits: Fresher breath, cleaner clothes, healthier appearance",
+                        ],
+                      },
+                      {
+                        title: "🎯 Next Steps",
+                        points: [
+                          "Set a weekly reduction goal: Aim for 10% less than last week",
+                          "Share progress with support group or counselor",
+                          "Plan activities to replace smoking habits",
+                          "Avoid alcohol/coffee initially (common triggers)",
+                          "Keep emergency contacts for cravings: Friends, helpline (1800-11-7656)",
+                        ],
+                      },
+                    ]}
+                  >
+                    <Bar data={weeklyChartData} options={chartOptions} />
+                  </FlippableChart>
                 </div>
               </CardContent>
             </Card>

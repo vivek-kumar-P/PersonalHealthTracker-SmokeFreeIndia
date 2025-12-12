@@ -10,6 +10,7 @@ import {
 } from "../lib/india-states-data"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FlippableChart } from "../components/flippable-chart"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -718,234 +719,536 @@ export function StatesPage() {
 
         {/* Enhanced Charts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* 1. Overall Prevalence */}
-          <Card className="lg:col-span-2 border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          {/* 1. Overall Prevalence - FIXED: overflow-hidden, flex-col, flex-1 on CardContent */}
+          <Card className="lg:col-span-2 border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-200 rounded-full -translate-y-16 -translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <span className="text-2xl">📊</span>
-                Overall Tobacco Prevalence
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl line-clamp-2">
+                <span className="text-xl sm:text-2xl flex-shrink-0">📊</span>
+                <span>Overall Tobacco Prevalence</span>
               </CardTitle>
-              <CardDescription className="text-gray-600">Percentage comparison of different usage metrics</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Percentage comparison of different usage metrics</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Bar
-                  data={prevalenceComparisonData}
-                  options={{
-                    ...chartOptions,
-                    indexAxis: "y" as const,
-                    scales: {
-                      x: { max: 100, grid: { color: "rgba(0,0,0,0.05)" } },
-                      y: { grid: { display: false } },
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-96">
+                <FlippableChart
+                  title="Overall Tobacco Prevalence"
+                  description="Percentage comparison of different usage metrics"
+                  insights={[
+                    {
+                      title: "🔍 Prevalence Breakdown",
+                      points: [
+                        `Ever tobacco users: ${totalData.everTobaccoUsers}%`,
+                        `Current tobacco users: ${totalData.currentTobaccoUsers}%`,
+                        `Ever smokers: ${totalData.everTobaccoSmokers}%`,
+                        `Current smokers: ${totalData.currentTobaccoSmokers}%`,
+                        `Smokeless users: ${totalData.currentSmokelessUsers}%`,
+                      ],
                     },
-                  }}
-                />
+                    {
+                      title: "💡 Key Observations",
+                      points: [
+                        "High prevalence indicates endemic tobacco use in this region",
+                        `Smoking dominance: ${totalData.currentTobaccoSmokers > totalData.currentSmokelessUsers ? "Smoked tobacco is primary form" : "Smokeless tobacco is more prevalent"}`,
+                        "Legacy users (ever users) significantly exceed current users - opportunity for prevention",
+                      ],
+                    },
+                    {
+                      title: "🎯 Policy Recommendations",
+                      points: [
+                        "Enforce tobacco control laws: Raise taxes, restrict advertising, ban promotional activities",
+                        "School-based prevention: Integrate tobacco education into curriculum",
+                        "Cessation support: Establish quit-smoking centers, offer counseling services",
+                        "Community awareness: Organize campaigns highlighting health risks",
+                      ],
+                    },
+                  ]}
+                >
+                  <Bar
+                    data={prevalenceComparisonData}
+                    options={{
+                      ...chartOptions,
+                      indexAxis: "y" as const,
+                      scales: {
+                        x: { max: 100, grid: { color: "rgba(0,0,0,0.05)" } },
+                        y: { grid: { display: false } },
+                      },
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 2. Smoked vs Smokeless */}
-          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-200 rounded-full -translate-y-16 translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">🥧</span>
                 Smoked vs Smokeless
               </CardTitle>
-              <CardDescription className="text-gray-600">Distribution of tobacco types</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Distribution of tobacco types</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Doughnut
-                  data={smokedVsSmokelessData}
-                  options={{
-                    ...chartOptions,
-                    cutout: "60%",
-                  }}
-                />
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="Smoked vs Smokeless Tobacco"
+                  description="Distribution of different tobacco consumption methods"
+                  insights={[
+                    {
+                      title: "📊 Distribution Analysis",
+                      points: [
+                        `Smoked tobacco users: ${totalData.currentTobaccoSmokers}%`,
+                        `Smokeless tobacco users: ${totalData.currentSmokelessUsers}%`,
+                        `Ratio: ${(totalData.currentTobaccoSmokers / Math.max(totalData.currentSmokelessUsers, 1)).toFixed(1)}:1 (Smoked:Smokeless)`,
+                      ],
+                    },
+                    {
+                      title: "💡 Health Implications",
+                      points: [
+                        "Smoked tobacco: Direct lung damage, COPD, cancer risks",
+                        "Smokeless tobacco: Oral cancer, gum disease, nicotine addiction",
+                        "Both forms carry equal addiction potential and mortality risks",
+                      ],
+                    },
+                    {
+                      title: "🎯 Targeted Interventions",
+                      points: [
+                        `Primary form (${totalData.currentTobaccoSmokers > totalData.currentSmokelessUsers ? "Smoking" : "Smokeless"}): Design specific cessation campaigns`,
+                        "Educate about health consequences of both forms",
+                        "Promote NRT (nicotine patches, gum) across demographic groups",
+                        "Partner with health workers for behavior change support",
+                      ],
+                    },
+                  ]}
+                >
+                  <Doughnut
+                    data={smokedVsSmokelessData}
+                    options={{
+                      ...chartOptions,
+                      cutout: "60%",
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 3. Product Type Breakdown */}
-          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-200 rounded-full -translate-y-16 translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">🚬</span>
                 Product Types
               </CardTitle>
-              <CardDescription className="text-gray-600">Breakdown by tobacco product</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Breakdown by tobacco product</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Pie data={productTypeData} options={chartOptions} />
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="Product Type Breakdown"
+                  description="Percentage distribution by specific tobacco products"
+                  insights={[
+                    {
+                      title: "📋 Product Prevalence",
+                      points: [
+                        `Cigarettes: ${totalData.currentCigaretteUsers}% (urban preference)`,
+                        `Bidis: ${totalData.currentBidiUsers}% (cheaper alternative)`,
+                        `Paan Masala: ${totalData.everPaanMasalaUsers}% (widespread in India)`,
+                        `Other smokeless: ${Math.max(0, totalData.currentSmokelessUsers - totalData.everPaanMasalaUsers)}% (gutka, snus)`,
+                      ],
+                    },
+                    {
+                      title: "💡 Market & Cultural Factors",
+                      points: [
+                        "Bidis popular among low-income groups (cheaper, accessible)",
+                        "Paan masala deeply rooted in social/cultural practices",
+                        "Cigarettes: Status symbol among affluent youth",
+                        "Marketing restrictions on traditional forms: Less enforcement",
+                      ],
+                    },
+                    {
+                      title: "🎯 Product-Specific Strategies",
+                      points: [
+                        "Cigarettes: Tax increases, packaging warnings, reduce displays",
+                        "Bidis: Occupational health programs for workers, cottage industry support for alternatives",
+                        "Paan: Community engagement, cultural re-framing, ingredient regulations",
+                        "E-cigarettes: Regulatory framework, youth education, market monitoring",
+                      ],
+                    },
+                  ]}
+                >
+                  <Pie data={productTypeData} options={chartOptions} />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 4. Urban vs Rural */}
-          <Card className="lg:col-span-2 border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="lg:col-span-2 border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-200 rounded-full -translate-y-16 -translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">🏙️</span>
                 Urban vs Rural Comparison
               </CardTitle>
-              <CardDescription className="text-gray-600">Regional differences in tobacco usage</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Regional differences in tobacco usage</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Bar
-                  data={urbanRuralData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      y: {
-                        max:
-                          Math.max(
-                            urbanData?.currentTobaccoUsers || 0,
-                            ruralData?.currentTobaccoUsers || 0,
-                            urbanData?.awarenessECigarette || 0,
-                            ruralData?.awarenessECigarette || 0,
-                          ) + 10,
-                      },
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="Urban vs Rural Comparison"
+                  description="Regional differences in tobacco consumption patterns"
+                  insights={[
+                    {
+                      title: "📊 Regional Breakdown",
+                      points: [
+                        `Urban - Current users: ${urbanData?.currentTobaccoUsers || 0}%, Smokers: ${urbanData?.currentTobaccoSmokers || 0}%`,
+                        `Rural - Current users: ${ruralData?.currentTobaccoUsers || 0}%, Smokers: ${ruralData?.currentTobaccoSmokers || 0}%`,
+                        `E-Cig awareness - Urban: ${urbanData?.awarenessECigarette || 0}%, Rural: ${ruralData?.awarenessECigarette || 0}%`,
+                      ],
                     },
-                  }}
-                />
+                    {
+                      title: "💡 Socio-Economic Factors",
+                      points: [
+                        `${(urbanData?.currentTobaccoUsers || 0) > (ruralData?.currentTobaccoUsers || 0) ? "Urban higher prevalence: Economic affordability, social stress, marketing exposure" : "Rural higher prevalence: Agricultural labor patterns, limited education, cultural acceptance"}`,
+                        "Infrastructure differences: Healthcare, cessation support availability",
+                        "E-cigarette trend: Urban youth adopt modern products; rural lag in awareness",
+                      ],
+                    },
+                    {
+                      title: "🎯 Regional Strategies",
+                      points: [
+                        "Urban: Youth programs, workplace policies, digital campaigns on social media",
+                        "Rural: Grassroots campaigns, mobile health clinics, farmer transition support",
+                        "Both: Culturally tailored messaging, local language resources",
+                        "Equity: Ensure affordable cessation services in underserved areas",
+                      ],
+                    },
+                  ]}
+                >
+                  <Bar
+                    data={urbanRuralData}
+                    options={{
+                      ...chartOptions,
+                      scales: {
+                        y: {
+                          max:
+                            Math.max(
+                              urbanData?.currentTobaccoUsers || 0,
+                              ruralData?.currentTobaccoUsers || 0,
+                              urbanData?.awarenessECigarette || 0,
+                              ruralData?.awarenessECigarette || 0,
+                            ) + 10,
+                        },
+                      },
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 5. Quit Attempts Radar */}
-          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-200 rounded-full -translate-y-16 translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">🎯</span>
                 Quit Attempts Profile
               </CardTitle>
-              <CardDescription className="text-gray-600">Cessation behavior analysis</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Cessation behavior analysis</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Radar
-                  data={quitAttemptsData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      r: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: { stepSize: 20 },
-                        pointLabels: { font: { size: 9 } },
-                      },
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="Quit Attempts Profile"
+                  description="Cessation behavior and readiness to quit"
+                  insights={[
+                    {
+                      title: "📊 Quit Behavior Metrics",
+                      points: [
+                        `Quit smoking in 12mo: ${totalData.quitSmokingLast12Months}%`,
+                        `Tried to quit smoking: ${totalData.triedQuitSmoking}%`,
+                        `Want to quit smoking: ${totalData.wantedQuitSmoking}%`,
+                        `Quit smokeless in 12mo: ${totalData.quitSmokelessLast12Months}%`,
+                      ],
                     },
-                  }}
-                />
+                    {
+                      title: "💡 Cessation Readiness",
+                      points: [
+                        `Want-to-quit vs actual quit: Gap indicates need for better support`,
+                        "Tried-to-quit failures: Need access to evidence-based interventions",
+                        "Success stories (12mo quit): Scalable intervention model needed",
+                      ],
+                    },
+                    {
+                      title: "🎯 Cessation Support Strategy",
+                      points: [
+                        "Increase cessation support infrastructure: Quit lines, counseling centers",
+                        "Provide evidence-based treatment: Nicotine replacement therapy (NRT)",
+                        "Behavioral support: Group counseling, motivational interviewing",
+                        "Follow-up: 3-6 month check-ins to prevent relapse",
+                      ],
+                    },
+                  ]}
+                >
+                  <Radar
+                    data={quitAttemptsData}
+                    options={{
+                      ...chartOptions,
+                      scales: {
+                        r: {
+                          beginAtZero: true,
+                          max: 100,
+                          ticks: { stepSize: 20 },
+                          pointLabels: { font: { size: 9 } },
+                        },
+                      },
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 6. Exposure Locations */}
-          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 left-0 w-32 h-32 bg-cyan-200 rounded-full -translate-y-16 -translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">🌍</span>
                 Exposure Locations
               </CardTitle>
-              <CardDescription className="text-gray-600">Where youth are exposed to smoke</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Where youth are exposed to smoke</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <PolarArea
-                  data={exposureData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      r: { beginAtZero: true },
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="Secondhand Smoke Exposure"
+                  description="Where youth encounter tobacco smoke and users"
+                  insights={[
+                    {
+                      title: "📍 Exposure Hotspots",
+                      points: [
+                        `Home/Public: ${totalData.exposureAtHomeOrPublic}%`,
+                        `At home: ${totalData.exposureAtHome}%`,
+                        `Enclosed public spaces: ${totalData.exposureEnclosedPublic}%`,
+                        `Outdoor public: ${totalData.exposureOutdoorPublic}%`,
+                        `School environment: ${totalData.sawSmokingAtSchool}%`,
+                      ],
                     },
-                  }}
-                />
+                    {
+                      title: "💡 Health Impact",
+                      points: [
+                        "Secondhand smoke contains 7,000+ chemicals; 70+ known carcinogens",
+                        "Home exposure: Most damaging, lifelong impact on children",
+                        "School exposure: Normalizes tobacco, accelerates youth initiation",
+                        "Public spaces: Limited enforcement of smoke-free regulations",
+                      ],
+                    },
+                    {
+                      title: "🎯 Protective Measures",
+                      points: [
+                        "Smoke-free homes & schools: Key protective policy",
+                        "Enforce public place bans: Restaurants, transport, workplaces",
+                        "Raise awareness: Secondhand smoke health risks",
+                        "Support smokers to quit: Best way to protect families",
+                      ],
+                    },
+                  ]}
+                >
+                  <PolarArea
+                    data={exposureData}
+                    options={{
+                      ...chartOptions,
+                      scales: {
+                        r: { beginAtZero: true },
+                      },
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 7. Age of Initiation */}
-          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-200 rounded-full -translate-y-16 translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">📅</span>
                 Median Age of Initiation
               </CardTitle>
-              <CardDescription className="text-gray-600">When youth start using tobacco</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">When youth start using tobacco</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Line
-                  data={ageInitiationData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      y: { min: 0, max: 16, title: { display: true, text: "Age (years)" } },
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="Median Age of Initiation"
+                  description="Average age when youth first use tobacco products"
+                  insights={[
+                    {
+                      title: "📊 Initiation Age Metrics",
+                      points: [
+                        `Cigarettes: ${totalData.medianAgeCigarette} years`,
+                        `Bidis: ${totalData.medianAgeBidi} years`,
+                        `Smokeless: ${totalData.medianAgeSmokeless} years`,
+                        `Trend: Younger initiation = Higher lifetime addiction risk`,
+                      ],
                     },
-                  }}
-                />
+                    {
+                      title: "💡 Why Early Initiation?",
+                      points: [
+                        "Peer influence & social pressure during adolescence",
+                        "Brain still developing: More susceptible to addiction",
+                        "Product availability & affordability in communities",
+                        "Limited enforcement of age-of-sale laws",
+                      ],
+                    },
+                    {
+                      title: "🎯 Prevention Strategy",
+                      points: [
+                        "Target pre-teen education: Elementary school tobacco awareness",
+                        "Strict age-of-sale enforcement: Regular vendor inspections",
+                        "Family engagement: Parental education on peer pressure response",
+                        "School & community programs: Delay initiation by 4-5 years = 70% less likely to become user",
+                      ],
+                    },
+                  ]}
+                >
+                  <Line
+                    data={ageInitiationData}
+                    options={{
+                      ...chartOptions,
+                      scales: {
+                        y: { min: 0, max: 16, title: { display: true, text: "Age (years)" } },
+                      },
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 8. E-Cigarette Stats */}
-          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+          <Card className="border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
             <div className="absolute top-0 left-0 w-32 h-32 bg-teal-200 rounded-full -translate-y-16 -translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-            <CardHeader className="relative z-10">
-              <CardTitle className="flex items-center gap-2 text-xl">
+            <CardHeader className="relative z-10 flex-shrink-0">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <span className="text-2xl">💨</span>
                 E-Cigarette & Future Risk
               </CardTitle>
-              <CardDescription className="text-gray-600">Modern tobacco trends</CardDescription>
+              <CardDescription className="text-gray-600 text-sm line-clamp-2">Modern tobacco trends</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="h-72">
-                <Bar
-                  data={eCigaretteData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      y: { max: 60 },
+            <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+              <div className="w-full h-80 sm:h-96">
+                <FlippableChart
+                  title="E-Cigarette Trends & Susceptibility"
+                  description="Emerging products and future smoking risk"
+                  insights={[
+                    {
+                      title: "📊 E-Cigarette Metrics",
+                      points: [
+                        `Awareness: ${totalData.awarenessECigarette}%`,
+                        `Ever used: ${totalData.everECigaretteUse}%`,
+                        `Susceptible to future smoking: ${totalData.susceptibleToFutureSmoking}%`,
+                        `Gap: High awareness but moderate usage = market still developing`,
+                      ],
                     },
-                  }}
-                />
+                    {
+                      title: "💡 Emerging Threat",
+                      points: [
+                        "Marketing claims: 'Safer' but nicotine equally addictive",
+                        "Gateway effect: E-cig users 4x more likely to start cigarettes",
+                        "Youth appeal: Flavors, sleek design, social media trends",
+                        "Long-term effects unknown: Insufficient evidence on lung health",
+                      ],
+                    },
+                    {
+                      title: "🎯 Regulatory Action",
+                      points: [
+                        "Restrict flavor sales: Focus on tobacco flavor only",
+                        "Ban online sales & social media marketing",
+                        "Enforce age-of-sale: Treat like cigarettes",
+                        "Education: Demystify false health claims",
+                        "Monitor: Track prevalence and disease outcomes",
+                      ],
+                    },
+                  ]}
+                >
+                  <Bar
+                    data={eCigaretteData}
+                    options={{
+                      ...chartOptions,
+                      scales: {
+                        y: { max: 60 },
+                      },
+                    }}
+                  />
+                </FlippableChart>
               </div>
             </CardContent>
           </Card>
 
           {/* 9. Comparison with India */}
           {selectedStateName !== "India" && (
-            <Card className="lg:col-span-3 border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+            <Card className="lg:col-span-3 border-0 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col">
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-200 rounded-full -translate-y-16 translate-x-16 opacity-10 group-hover:scale-110 transition-transform" />
-              <CardHeader className="relative z-10">
-                <CardTitle className="flex items-center gap-2 text-xl">
+              <CardHeader className="relative z-10 flex-shrink-0">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   <span className="text-2xl">🇮🇳</span>
                   {selectedStateName} vs India Average
                 </CardTitle>
-                <CardDescription className="text-gray-600">How this state compares to the national average</CardDescription>
+                <CardDescription className="text-gray-600 text-sm line-clamp-2">How this state compares to the national average</CardDescription>
               </CardHeader>
-              <CardContent className="relative z-10">
-                <div className="h-72">
-                  <Bar
-                    data={comparisonWithIndiaData}
-                    options={{
-                      ...chartOptions,
-                      indexAxis: "y" as const,
-                      scales: {
-                        x: { max: Math.max(totalData.currentTobaccoUsers, totalData.awarenessECigarette, 30) + 10 },
+              <CardContent className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 sm:p-6">
+                <div className="w-full h-80 sm:h-96">
+                  <FlippableChart
+                    title={`${selectedStateName} vs National Average`}
+                    description="Comparative analysis with India-wide statistics"
+                    insights={[
+                      {
+                        title: "📊 State vs National Comparison",
+                        points: [
+                          `Current users - ${selectedStateName}: ${totalData.currentTobaccoUsers}% vs India: ${indiaData?.currentTobaccoUsers || 0}%`,
+                          `Smokers - ${selectedStateName}: ${totalData.currentTobaccoSmokers}% vs India: ${indiaData?.currentTobaccoSmokers || 0}%`,
+                          `Smokeless - ${selectedStateName}: ${totalData.currentSmokelessUsers}% vs India: ${indiaData?.currentSmokelessUsers || 0}%`,
+                          `${totalData.currentTobaccoUsers > (indiaData?.currentTobaccoUsers || 0) ? "Above-average" : "Below-average"} prevalence compared to national average`,
+                        ],
                       },
-                    }}
-                  />
+                      {
+                        title: "💡 Performance Insights",
+                        points: [
+                          `Quit rate - ${selectedStateName}: ${totalData.quitSmokingLast12Months}% vs India: ${indiaData?.quitSmokingLast12Months || 0}%`,
+                          `E-Cigarette awareness - ${selectedStateName}: ${totalData.awarenessECigarette}% vs India: ${indiaData?.awarenessECigarette || 0}%`,
+                          `${totalData.quitSmokingLast12Months > (indiaData?.quitSmokingLast12Months || 0) ? "Better cessation support" : "Needs improved cessation programs"}`,
+                        ],
+                      },
+                      {
+                        title: "🎯 Targeted Improvement Plan",
+                        points: [
+                          `If above-average: Share best practices with other states; strengthen local programs`,
+                          `If below-average: Learn from high-performing states; scale evidence-based interventions`,
+                          "Invest in data collection: Monitor progress quarterly",
+                          "Set state-specific targets: Align with WHO FCTC commitments",
+                        ],
+                      },
+                    ]}
+                  >
+                    <Bar
+                      data={comparisonWithIndiaData}
+                      options={{
+                        ...chartOptions,
+                        indexAxis: "y" as const,
+                        scales: {
+                          x: { max: Math.max(totalData.currentTobaccoUsers, totalData.awarenessECigarette, 30) + 10 },
+                        },
+                      }}
+                    />
+                  </FlippableChart>
                 </div>
               </CardContent>
             </Card>

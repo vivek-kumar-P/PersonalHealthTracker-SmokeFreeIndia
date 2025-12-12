@@ -1,4 +1,5 @@
-const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5000/api"
+// Prefer env var; fall back to local backend without an extra /api prefix (backend mounts routes at root)
+const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:5000"
 
 // Auth helpers
 export const getToken = () => localStorage.getItem("token")
@@ -28,9 +29,16 @@ async function apiClient(endpoint: string, options: RequestInit = {}) {
     headers: headersObj as HeadersInit,
   })
 
+  // Gracefully handle non-JSON error responses to avoid "Unexpected token '<'" when an HTML page is returned
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error || "Something went wrong")
+    const fallback = response.clone()
+    try {
+      const error = await response.json()
+      throw new Error(error.error || error.message || "Something went wrong")
+    } catch (e) {
+      const text = await fallback.text()
+      throw new Error(text || "Something went wrong")
+    }
   }
 
   return response.json()
