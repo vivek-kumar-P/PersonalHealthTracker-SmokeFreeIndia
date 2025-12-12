@@ -28,12 +28,12 @@ app.get("/", (req, res) => {
 })
 
 // Routes
-app.use("/api/auth", authRoutes)
-app.use("/api/states", statesRoutes)
-app.use("/api/logs", logsRoutes)
+app.use("/auth", authRoutes)
+app.use("/states", statesRoutes)
+app.use("/logs", logsRoutes)
 
 // Health check
-app.get("/api/health", (req, res) => {
+app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "SmokeFree India API is running" })
 })
 
