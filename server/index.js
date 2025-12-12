@@ -22,6 +22,11 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected Successfully"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err))
 
+// Root route
+app.get("/", (req, res) => {
+  res.json({ message: "SmokeFree India API is running", version: "1.0.0" })
+})
+
 // Routes
 app.use("/api/auth", authRoutes)
 app.use("/api/states", statesRoutes)
